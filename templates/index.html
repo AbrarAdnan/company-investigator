@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html>
+<title>Game Genre Classifier</title>
+
+<head>
+    <link rel="stylesheet" href="/static/css/labelpopup.css">
+    <link rel="stylesheet" href="/static/css/mylink.css">
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.1/css/all.css"
+        integrity="sha384-5sAR7xN1Nv6T6+dT2mhtzEpVJvfS3NScPQTrOxhwjIuvcA67KV2R5Jz6kr4abQsz" crossorigin="anonymous">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+    <style>
+        @import url('https://fonts.cdnfonts.com/css/battlestar');
+        @import url('https://fonts.cdnfonts.com/css/games');
+        @import url('https://fonts.cdnfonts.com/css/methanerse-free-trial');
+        @import url('https://fonts.cdnfonts.com/css/aquire');
+
+        .popup-button {
+            appearance: none;
+            background: #16a34a;
+            border-radius: 0.25em;
+            color: white;
+            cursor: pointer;
+            display: inline;
+            font-weight: 500;
+            padding: 0 1em;
+        }
+
+        .popup-button:hover {
+            background-color: #17ac4e;
+        }
+
+        .popup-details-modal {
+            background: #ffffff;
+            border-radius: 0.5em;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            left: 50%;
+            max-width: 90%;
+            pointer-events: none;
+            position: absolute;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 30em;
+            text-align: left;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            z-index: 9999;
+        }
+
+        .popup-details-modal .popup-details-modal-close {
+            align-items: center;
+            color: #111827;
+            display: flex;
+            height: 4.5em;
+            justify-content: center;
+            pointer-events: none;
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 4.5em;
+        }
+
+        .popup-details-modal .popup-details-modal-close svg {
+            display: block;
+        }
+
+        .popup-details-modal .popup-details-modal-title {
+            color: #111827;
+            padding: 1.5em 2em;
+            pointer-events: all;
+            position: relative;
+            width: calc(100% - 4.5em);
+        }
+
+        .popup-details-modal .popup-details-modal-title h1 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            line-height: normal;
+        }
+
+        .popup-details-modal .popup-details-modal-content {
+            border-top: 1px solid #e0e0e0;
+            padding: 2em;
+            pointer-events: all;
+            overflow: auto;
+            background-color: #111827;
+            font-size: medium;
+            font-weight: lighter;
+        }
+
+        .popup-details-modal-overlay {
+            transition: opacity 0.2s ease-out;
+            pointer-events: none;
+            background: #515662;
+            position: fixed;
+            opacity: 0;
+            bottom: 0;
+            right: 0;
+            left: 0;
+            top: 0;
+        }
+
+        details[open] .popup-details-modal-overlay {
+            pointer-events: all;
+            opacity: 0.3;
+        }
+
+        details summary {
+            list-style: none;
+        }
+
+        details summary:focus {
+            outline: none;
+        }
+
+        details summary::-webkit-details-marker {
+            display: none;
+        }
+
+        code {
+            font-family: Monaco, monospace;
+            line-height: 100%;
+            background-color: #2d2d2c;
+            padding: 0.1em 0.4em;
+            letter-spacing: -0.05em;
+            word-break: normal;
+            border-radius: 7px;
+            color: white;
+            font-weight: normal;
+            font-size: 1.75rem;
+            position: relative;
+            top: -2px;
+        }
+
+        .popup-container {
+            text-align: center;
+            max-width: 40em;
+            padding: 2em;
+        }
+
+        .popup-container>h1 {
+            font-weight: 700;
+            font-size: 2rem;
+            line-height: normal;
+            color: #111827;
+        }
+
+        .popup-container>p {
+            margin-top: 2em;
+            margin-bottom: 2em;
+        }
+
+        .popup-container sup {
+            font-size: 1rem;
+            margin-left: 0.25em;
+            opacity: 0.5;
+            position: relative;
+        }
+
+        .popup-details-modal-content {
+            display: flex;
+            flex-wrap: wrap;
+            overflow-y: auto;
+            max-height: 300px;
+            /* adjust this value as needed */
+        }
+
+        .popup-details-modal-content p {
+            margin: 0 10px 10px 0;
+            padding: 0;
+            flex: 1 0 45%;
+            /* adjust this value as needed */
+        }
+
+        /* The top is the popup */
+
+        body {
+            display: flex;
+            justify-content: center;
+            font-family: Roboto, Arial, sans-serif;
+            font-size: 15px;
+            background-image: url("/static/images/seamless_bg.png");
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: center center;
+            background-attachment: fixed;
+            background-color: #333333;
+        }
+
+
+        html {
+            display: flex;
+            justify-content: center;
+            font-family: Roboto, Arial, sans-serif;
+            font-size: 15px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 150px;
+            padding: 12px 20px;
+            box-sizing: border-box;
+            border: 2px solid #ccc;
+            border-radius: 4px;
+            background-color: #f8f8f8;
+            font-size: 16px;
+            resize: both;
+        }
+
+        form {
+            backdrop-filter: blur(2px);
+            background-color: rgba(0, 0, 0, 0.233);
+            border: 4px solid #d6d6d683;
+            border-radius: 10px;
+        }
+
+        input[type=text],
+        input[type=password] {
+            width: 100%;
+            padding: 16px 8px;
+            margin: 8px 0;
+            display: inline-block;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+
+        .icon {
+            font-size: 110px;
+            display: flex;
+            justify-content: center;
+            color: #4286f4;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 25px;
+        }
+
+        h2 {
+            text-align: center;
+            font-size: 20px;
+        }
+
+        .formcontainer {
+            text-align: center;
+            margin: 12px 50px 24px;
+        }
+
+        .container {
+            padding: 16px 0;
+            text-align: left;
+        }
+
+        span.psw {
+            float: right;
+            padding-top: 0;
+            padding-right: 15px;
+        }
+
+        /* Change styles for span on extra small screens */
+        @media screen and (max-width: 480px) {
+            span.psw {
+                display: block;
+                float: none;
+            }
+
+            .formcontainer {
+                margin: 12px 20px 24px;
+            }
+        }
+
+        /* Change styles for textarea on small screens */
+        @media screen and (max-width: 768px) {
+            textarea {
+                width: 100%;
+            }
+        }
+
+        /* Change styles for form on large screens */
+        @media screen and (min-width: 1024px) {
+            form {
+                max-width: 600px;
+                margin: 0 auto;
+            }
+        }
+
+
+        @import url("https://fonts.googleapis.com/css2?family=VT323&display=swap");
+
+        #intro {
+            color: white;
+            font-family: 'Aquire', sans-serif;
+        }
+
+
+        [class*="btn-glitch-"] {
+            display: inline-block;
+            font-family: "VT323", monospace;
+            border: 1px solid white;
+            color: rgb(29, 28, 28);
+            padding: 10px 13px;
+            min-width: 175px;
+            line-height: 1.5em;
+            white-space: no-wrap;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+
+        [class*="btn-glitch-"] .text,
+        [class*="btn-glitch-"] .decoration {
+            display: inline-block;
+        }
+
+        [class*="btn-glitch-"] .decoration {
+            display: inline-block;
+            float: right;
+        }
+
+        [class*="btn-glitch-"]:hover,
+        [class*="btn-glitch-"]:focus {
+            animation-name: glitch;
+            animation-duration: 0.2s;
+            background-color: yellow;
+            color: black;
+            border: 1px solid yellow;
+        }
+
+        [class*="btn-glitch-"]:hover .text-decoration,
+        [class*="btn-glitch-"]:focus .text-decoration {
+            animation-name: blink;
+            animation-duration: 0.1s;
+            animation-iteration-count: infinite;
+        }
+
+        [class*="btn-glitch-"]:hover .decoration,
+        [class*="btn-glitch-"]:focus .decoration {
+            animation-name: blink;
+            animation-duration: 0.1s;
+            animation-iteration-count: infinite;
+        }
+
+        [class*="btn-glitch-"]:hover :before,
+        /* [class*="btn-glitch-"]:focus :before {
+      content: " ";
+      width: 15px;
+      border: 1px solid black;
+      position: absolute;
+      right: 25%;
+      bottom: 1px;
+      transform: rotate(35deg);
+    } */
+
+        [class*="btn-glitch-"]:hover :after,
+        /* [class*="btn-glitch-"]:focus :after {
+      animation-name: shrink;
+      animation-duration: 0.5s;
+      animation-iteration-count: 1;
+      animation-fill-mode: forwards;
+      content: " ";
+      width: 75%;
+      border: 10px solid black;
+      position: absolute;
+      left: 0;
+      bottom: 0;
+    } */
+
+        [class*="btn-glitch-"]:active {
+            background: none;
+            color: yellow;
+        }
+
+        [class*="btn-glitch-"]:active .text-decoration {
+            animation-name: none;
+        }
+
+        [class*="btn-glitch-"]:active .decoration {
+            animation-name: none;
+        }
+
+        [class*="btn-glitch-"]:active :before,
+        [class*="btn-glitch-"]:active :after {
+            display: none;
+        }
+
+        @keyframes glitch {
+            25% {
+                background-color: red;
+                transform: translateX(-10px);
+                letter-spacing: 10px;
+            }
+
+            35% {
+                background-color: green;
+                transform: translate(10px);
+            }
+
+            59% {
+                opacity: 0;
+            }
+
+            60% {
+                background-color: blue;
+                transform: translate(-10px);
+                filter: blur(5px);
+            }
+
+            100% {
+                background-color: yellow;
+                blur: 5px;
+            }
+        }
+
+        @keyframes blink {
+            50% {
+                opacity: 0;
+            }
+        }
+
+        @keyframes shrink {
+            100% {
+                width: 10%;
+            }
+        }
+
+        @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+
+        html {
+            box-sizing: border-box;
+        }
+
+        *,
+        *:before,
+        *:after {
+            box-sizing: border-box;
+        }
+
+        /* body {
+-webkit-font-smoothing: antialiased;
+-moz-osx-font-smoothing: grayscale;
+background-color: #f9fafb;
+font-size: 70%;
+line-height: 1.4;
+font-family: "Inter", sans-serif;
+color: #6b7280;
+font-weight: 400;
+}
+
+@media only screen and (min-width: 600px) {
+body {
+justify-content: center;
+align-items: center;
+display: flex;
+height: 100vh;
+font-size: 100%;
+}
+} */
+    </style>
+
+</head>
+
+<body>
+    <form action="/" method="post" id="my-form" style="margin: 12px 50px 24px;">
+
+        <div class="formcontainer">
+            <div class="container">
+                <div style="text-align:center">
+                    <div
+                        style="display:flex; flex-direction:column; justify-content:center; align-items:center; height:auto; margin: 12px 5%; max-width: 1000px; font-weight:300; font-family: 'Aquire', sans-serif;">
+                        <h1 style="text-align:center; margin: 0;  color: #ffffff; font-size:30px; white-space:nowrap;">
+                            <br><br>_ // Business Investigator \\ _</h1>
+                        <h4 id="intro"
+                            style="text-align:center; font-family: 'Aquire', sans-serif; margin: 10px 0; font-size:20px; font-weight:300;">
+                            Made by: Abrar Faiaz Adnan and Md. Sabik Irbaz for Innoscripta hackathon <br>
+                    </div>
+                    </h4>
+                </div>
+
+
+
+            </div>
+            <label for="company_name" id="intro" style="font-weight: 300;"><strong>Company Name:</strong></label>
+            <input type="text" id="company_name" name="company_name" required>
+
+            <label for="country" id="intro" style="font-weight: 300;"><strong>Country:</strong></label>
+            <input type="text" id="country" name="country" required>
+
+            <label for="company_website" id="intro" style="font-weight: 300;"><strong>Company Website:</strong></label>
+            <input type="text" id="company_website" name="company_website" placeholder="Optional">
+            
+
+            <div
+                style="display:flex;justify-content:center;width:100%; margin-top:10px; font-family: 'Aquire', sans-serif;">
+                <button type="submit" class="btn-glitch-fill" id="submit-btn">
+                    <span class="text" style="font-family: 'Aquire', sans-serif;">// Submit</span><span
+                        class="text-decoration">_</span>
+                </button>
+            </div>
+        </div>
+        </div>
+
+
+        {% if show=='result' %}
+        <div id="intro" style="text-align:center;margin:3vh; ">
+        </div>
+        <div class="message_container">
+            <div class="message" augmented-ui="exe tl-clip br-clip"
+                style="margin:0 auto;border:2px solid gray;border-radius:10px;background-color:rgba(209, 190, 190, 0.719);padding:20px;width:80%;">
+                <div class="title" augmented-ui="exe tl-clip br-clip">Products and services :</div>
+                <div class="result"
+                    style="font-weight:300;font-size:18px;margin:1vh; font-family: 'Aquire', sans-serif;">
+                    {% for item in product_services %}
+                        <p style="margin:3px;">{{ item }}</p>
+                    {% endfor %}
+                </div>
+                <div class="title" augmented-ui="exe tl-clip br-clip">Keywords :</div>
+                <div class="result"
+                    style="font-weight:300;font-size:18px;margin:1vh; font-family: 'Aquire', sans-serif;">
+                    {% for item in keyword %}
+                        <p style="margin:3px;">{{ item }}</p>
+                    {% endfor %}
+                </div>
+                <div class="title" augmented-ui="exe tl-clip br-clip">SIC Code :</div>
+                <div class="result"
+                    style="font-weight:300;font-size:18px;margin:1vh; font-family: 'Aquire', sans-serif;">
+                    {% for item in sic %}
+                        <p style="margin:3px;">{{ item }}</p>
+                    {% endfor %}
+                </div>
+                <div class="title" augmented-ui="exe tl-clip br-clip">NAICS Code :</div>
+                <div class="result"
+                    style="font-weight:300;font-size:18px;margin:1vh; font-family: 'Aquire', sans-serif;">
+                    {% for item in naics %}
+                        <p style="margin:3px;">{{ item }}</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+
+    </form>
+    <script>
+
+
+    </script>
+
+</body>
+
+</html>
