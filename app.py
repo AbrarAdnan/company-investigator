@@ -1,69 +1,96 @@
-from flask import Flask, render_template, request
-import asyncio
+from flask import Flask, render_template, request, jsonify
+import asyncio, re
 from EdgeGPT import Chatbot, ConversationStyle
-import re
 
 app = Flask(__name__, static_url_path='/static')
 
-async def main(prompt):
-    bot = await Chatbot.create()  # Passing cookies is optional
+async def main(prompt, conversation_style):
+    bot = await Chatbot.create()
 
-    response = await bot.ask(prompt=prompt, conversation_style=ConversationStyle.balanced)
+    response = await bot.ask(prompt=prompt, conversation_style=conversation_style)
 
     # Get the response message
     messages = response['item']['messages']
-    response_message = messages[1]['text']  # Assuming the response is at index 1
+    response_message = messages[1]['text']
 
     await bot.close()
 
     return response_message
 
 def get_data(prompt):
-    # Run the script and capture the output
-    response = asyncio.run(main(prompt))
-    print("Response:", response)
+    responses = []
+    conversation_styles = [ConversationStyle.balanced, ConversationStyle.creative, ConversationStyle.precise]
 
-    # Extract the part within the `output` variable
-    output_match = re.search(r"output\s+=\s+(\[.*?\])", response, re.DOTALL)
-    if output_match:
-        output_code = output_match.group(1)
-        output = eval(output_code)
-    else:
-        output = []
-    return output
+    for conversation_style in conversation_styles:
+        print(conversation_style)
+        try:
+            response = asyncio.run(main(prompt, conversation_style))
+        except Exception:
+            response = "N/A"
+        responses.append(response)
+        print(response)
+
+    outputs = []
+    for response in responses:
+        if response == "N/A":
+            continue
+
+        output_match = re.search(r"output\s+=\s+(\[.*?\])", response, re.DOTALL)
+        if output_match:
+            output_code = output_match.group(1)
+            try:
+                output = eval(output_code)
+                outputs.extend(output)
+            except Exception:
+                pass
+
+    flattened_outputs = list(set(outputs))
+    return flattened_outputs
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
-        company_name = request.form['company_name']
-        country = request.form['country']
-        company_website = request.form['company_website']
+        if request.content_type == 'application/json':
+            data = request.get_json()
+            company_name = data.get('company_name')
+            country = data.get('country')
+            company_website = data.get('company_website')
+        else:
+            company_name = request.form.get('company_name')
+            country = request.form.get('country')
+            company_website = request.form.get('company_website')
+
         print(company_name)
         print(company_website)
         print(country)
         result = company_name
 
-        # Get the products/services list
-        product_services_prompt = f"Give me the products/services of {company_name} from {country} as a list variable in Python called output"
+        product_services_prompt = f"Give me the products/services of the company {company_name} from {country} as a list variable in Python called output"
         product_services = get_data(product_services_prompt)
         print(product_services)
 
-        # Get the keywords
-        keyword_prompt = f"Give me the Keywords related to {company_name} from {country} as list variable in python called output"
+        keyword_prompt = f"Give me the keywords related to the company {company_name} from {country} as list variable in python called output"
         keyword = get_data(keyword_prompt)
         print(keyword)
 
-        # Get the keywords
-        sic_prompt = f"Give me the SIC company classification of {company_name} from {country} as list variable in python called output"
+        sic_prompt = f"Give me the SIC company classification number of company {company_name} from {country} as list variable in python called output"
         sic = get_data(sic_prompt)
         print(sic)
 
-        # Get the keywords
-        naics_prompt = f"Give me the NAICS company classification of {company_name} from {country} as list variable in python called output"
+        naics_prompt = f"Give me the NAICS company classification number of company {company_name} from {country} as list variable in python called output"
         naics = get_data(naics_prompt)
         print(naics)
 
-        return render_template('index.html', show='result', results=result, product_services = product_services, keyword = keyword, sic = sic, naics = naics)
+        if request.content_type == 'application/json':
+                response = {
+                        'product_services': product_services,
+                        'keyword': keyword,
+                        'sic' : sic,
+                        'naics' : naics
+                }
+                return jsonify(response)
+        else:
+            return render_template('index.html', show='result', results=result, product_services = product_services, keyword = keyword, sic = sic, naics = naics)
     else:
         return render_template('index.html', show=False)
 
