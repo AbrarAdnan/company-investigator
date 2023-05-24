@@ -21,10 +21,9 @@ async def main(prompt, conversation_style):
 
     return response_message
 
-
 def get_data(prompt):
     responses = []
-    conversation_styles = [ConversationStyle.balanced, ConversationStyle.creative, ConversationStyle.precise]
+    conversation_styles = [ConversationStyle.balanced, ConversationStyle.precise]
 
     for conversation_style in conversation_styles:
         print(conversation_style)
