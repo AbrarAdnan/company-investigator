@@ -94,6 +94,7 @@ def index():
                 }
                 return jsonify(response)
         else:
+            print("output aitase")
             return render_template('index.html', show='result', results=result, product_services = product_services, keyword = keyword, sic = sic, naics = naics)
     else:
         return render_template('index.html', show=False)
