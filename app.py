@@ -5,17 +5,22 @@ from EdgeGPT import Chatbot, ConversationStyle
 app = Flask(__name__, static_url_path='/static')
 
 async def main(prompt, conversation_style):
-    bot = await Chatbot.create()
+    try:
+        bot = await Chatbot.create()
+        response = await bot.ask(prompt=prompt, conversation_style=conversation_style)
 
-    response = await bot.ask(prompt=prompt, conversation_style=conversation_style)
-
-    # Get the response message
-    messages = response['item']['messages']
-    response_message = messages[1]['text']
-
-    await bot.close()
+        # Get the response message
+        messages = response['item']['messages']
+        response_message = messages[1]['text']
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        response_message = "N/A"
+    finally:
+        if bot:
+            await bot.close()
 
     return response_message
+
 
 def get_data(prompt):
     responses = []
