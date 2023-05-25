@@ -35,7 +35,7 @@ python app.py
 ``
 When the server is running you can try it out on your browser by visiting this link http://127.0.0.1:5000/ 
 
-Or you can send a json payload to http://127.0.0.1:5000/ 
+Or you can send a json payload through GET method to http://127.0.0.1:5000/ 
 in this exaple format
 ```
 {
