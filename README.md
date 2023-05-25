@@ -9,6 +9,10 @@ To install Company Investigator, clone this repository using the following comma
 ```
 git clone https://github.com/AbrarAdnan/company-investigator.git
 ```
+Change directory to the downloaded folder
+```
+cd company-investigator
+```
 After cloning the repository, create a virtual environment for the program by running the following command:
 ```
 virtualenv venv
