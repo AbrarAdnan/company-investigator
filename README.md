@@ -33,8 +33,9 @@ To run Company Investigator, activate your virtual environment and navigate to t
 ``
 python app.py
 ``
+When the server is runnign you can try it out on your browser by visiting http://127.0.0.1:5000/ 
 
-Send a json payload to http://127.0.0.1:5000/ 
+Or you can send a json payload to http://127.0.0.1:5000/ 
 in this exaple format
 ```
 {
