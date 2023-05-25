@@ -36,13 +36,16 @@ python app.py
 
 Send a json payload to http://127.0.0.1:5000/ 
 in this exaple format
+```
 {
   "company_name": "Microsoft",
   "country": "Uniter States of America",
   "company_website": "www.microsoft.com"
 }
+```
 and you'll get the output with the description on company product/services, keywords related to company, naics code and sic code
 the example output of the api response will be
+```
 {
     "keyword": [
         "Microsoft",
@@ -59,3 +62,4 @@ the example output of the api response will be
         7389
     ]
 }
+```
