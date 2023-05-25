@@ -9,6 +9,10 @@ To install Company Investigator, clone this repository using the following comma
 ```
 git clone https://github.com/AbrarAdnan/company-investigator.git
 ```
+Change directory to the downloaded folder
+```
+cd company-investigator
+```
 After cloning the repository, create a virtual environment for the program by running the following command:
 ```
 virtualenv venv
@@ -29,16 +33,20 @@ To run Company Investigator, activate your virtual environment and navigate to t
 ``
 python app.py
 ``
+When the server is runnign you can try it out on your browser by visiting http://127.0.0.1:5000/ 
 
-Send a json payload to http://127.0.0.1:5000/ 
+Or you can send a json payload to http://127.0.0.1:5000/ 
 in this exaple format
+```
 {
   "company_name": "Microsoft",
   "country": "Uniter States of America",
   "company_website": "www.microsoft.com"
 }
+```
 and you'll get the output with the description on company product/services, keywords related to company, naics code and sic code
 the example output of the api response will be
+```
 {
     "keyword": [
         "Microsoft",
@@ -55,3 +63,4 @@ the example output of the api response will be
         7389
     ]
 }
+```
