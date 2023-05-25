@@ -1,4 +1,4 @@
-Company Investigator
+#Company Investigator
 
 This is a Python program designed to investigate companie information. The program requires Python 3.8 or later, and has been tested on Python 3.9.0.
 
@@ -9,21 +9,31 @@ To install Company Investigator, clone this repository using the following comma
 git clone https://github.com/AbrarAdnan/company-investigator.git
 ```
 After cloning the repository, create a virtual environment for the program by running the following command:
-
+```
 virtualenv venv
+```
+Activate the virtual environment using the following command (on windows):
 
-Activate the virtual environment using the following command:
-
-source venv/bin/activate
+```
+venv/scripts/activate
+```
 
 Finally, install the required dependencies using the following command:
-
+```
 pip install -r requirements.txt
-
+```
 Usage
 
 To run Company Investigator, activate your virtual environment and navigate to the cloned repository directory. Run the program using the following command:
+``
+python app.py
+``
 
-python company_investigator.py
-
-Follow the prompts to input the company information you would like to investigate.
+Send a json payload to http://127.0.0.1:5000/ 
+in this format
+{
+  "company_name": "Microsoft",
+  "country": "Uniter States of America",
+  "company_website": "www.microsoft.com"
+}
+and you'll get the output with the description on company product/services, keywords related to company, naics code and sic code
