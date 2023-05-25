@@ -1,7 +1,7 @@
 Company Investigator
 
 
-This is a Python program designed to investigate companie information. The program requires Python 3.8 or later, and has been tested on Python 3.9.0.
+This is a Python program designed to investigate company information. The program requires Python 3.8 or later, and has been tested on Python 3.9.0.
 
 Installation
 
@@ -33,7 +33,7 @@ To run Company Investigator, activate your virtual environment and navigate to t
 ``
 python app.py
 ``
-When the server is runnign you can try it out on your browser by visiting http://127.0.0.1:5000/ 
+When the server is running you can try it out on your browser by visiting this link http://127.0.0.1:5000/ 
 
 Or you can send a json payload to http://127.0.0.1:5000/ 
 in this exaple format
