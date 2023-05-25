@@ -1,4 +1,5 @@
-#Company Investigator
+Company Investigator
+
 
 This is a Python program designed to investigate companie information. The program requires Python 3.8 or later, and has been tested on Python 3.9.0.
 
